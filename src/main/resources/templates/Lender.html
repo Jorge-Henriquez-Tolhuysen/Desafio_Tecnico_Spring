@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lender's Page</title>
+    <style>
+        .information {
+            width:100%;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+        }
+        .information span {
+            position:absolute;
+            right:8px;
+            font-style: revert;
+        }
+        .errors {
+            background-color: lightsalmon;
+            text-align: center;
+        }
+
+        table {
+            width:100%
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        table tr:nth-child(even) {
+            background-color: #eee;
+        }
+        table tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        table th {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="information">
+    <hr/>
+    <span th:text="${sessionId}">Id de session</span><br/>
+</div>
+<a style="float:right;" href="/Logout" >Logout</a><br/>
+Name : <span th:text="${name}">Lender name</span><br/>
+Account Balance: <span th:text="${accountBalance}">Lender acount balance</span><br/>
+<div class="errors" th:if="${message != null}">
+    <br/>
+    <span style="margin: 0 auto;" th:text="${message}">Lender acount balance</span>
+    <br/>
+    <br/>
+</div>
+<br/>
+<br/>
+List of People who are in need of help : <br/>
+<br/>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Money Needed for</th>
+        <th>Description</th>
+        <th>Amount Needed</th>
+        <th>Amount Raised</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="userInNeed : ${usersInNeed}">
+        <td th:text="${userInNeed.name}">User Name</td>
+        <td th:text="${userInNeed.moneyNeededFor}">User Money Needed for</td>
+        <td th:text="${userInNeed.description}">User Description</td>
+        <td th:text="${userInNeed.amountNeeded}">User Amount Needed</td>
+        <td th:text="${userInNeed.amountRaised}">User Amount Raised</td>
+        <td style="width:200px">
+            <form th:if="${userInNeed.maxMoneyToLend} &gt; 0" action="#" th:attr="action=@{/Lender/lend}" th:object="${data}" method="post">
+                <input th:attr="max=${userInNeed.maxMoneyToLend}" style="width:100px" name="money" type="number" min="100" max="5000"  required></input>
+                <input type="hidden" name="lenderId" th:attr="value=${lenderId}"></input>
+                <input type="hidden" name="borrowerId" th:attr="value=${userInNeed.id}"></input>
+                <input type="submit" value="LEND"></input>
+            </form>
+        </td>
+    </tr>
+</table>
+<br/>
+<br/>
+List of People you lent money : <br/>
+<br/>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Money Needed for</th>
+        <th>Description</th>
+        <th>Amount Needed</th>
+        <th>Amount Raised</th>
+        <th>Amount Lent</th>
+    </tr>
+    <tr th:each="userLent : ${usersLent}">
+        <td th:text="${userLent.name}">User Name</td>
+        <td th:text="${userLent.moneyNeededFor}">User Need Money For</td>
+        <td th:text="${userLent.description}">User Description</td>
+        <td th:text="${userLent.amountNeeded}">User Amount Needed</td>
+        <td th:text="${userLent.amountRaised}">User Amount Raised</td>
+        <td th:text="${userLent.amountLent}">User Amount Lent</td>
+    </tr>
+</table>
+</body>
+</html>

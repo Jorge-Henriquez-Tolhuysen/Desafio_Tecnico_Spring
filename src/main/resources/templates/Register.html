@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Página de Registro</title>
+<style>
+	.information {
+		width:100%;
+		position: fixed;
+		left: 0;
+		bottom: 0;
+	}
+	.information span {
+		position:absolute;
+		right:8px;
+		font-style: revert;
+	}
+	#d0 {
+		display:inline-block;
+		width:5%;
+	}
+	#d1 {
+		display:inline-block;
+		width:45%;
+		vertical-align: top;
+	}
+	.d1label {
+		display:inline-block;
+		width:30%;
+		vertical-align: top;
+	}
+	.d1value {
+		display:inline-block;
+		width:60%;
+		vertical-align: top;
+	}
+	#d2 {
+		display:inline-block;
+		width:45%;
+		vertical-align: top;
+	}
+	.d2label {
+		display:inline-block;
+		width:30%;
+		vertical-align: top;
+	}
+	.d2value {
+		display:inline-block;
+		width:60%;
+		vertical-align: top;
+	}
+	
+	input, textarea {
+		width:100%;
+	}
+	
+	p {
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	
+	input[type="submit"] {
+		float:right; 
+		width:100px;
+	}
+	
+</style>
+</head>
+<body>
+<div class="information">
+	<hr/>
+	<span th:text="${sessionId}">Id de session</span><br/>
+</div>
+<div id="d0">&nbsp;</div>
+<div id="d1">
+	<p>LENDER</p>
+	<form action="#" th:attr="action=@{/RegisterLender}" th:object="${lenderData}" method="post">
+		<div class="d1label"><label>FIRST NAME:</label></div><div class="d1value"><input type="text" th:field="*{firstName}" required></input></div><br/>
+		<div class="d1label">LAST NAME:</div><div class="d1value"><input type="text" th:field="*{lastName}" required></input></div><br/>
+		<div class="d1label">EMAIL:</div><div class="d1value"><input type="email" th:field="*{eMail}" required></input></div><br/>
+		<div class="d1label">PASSWORD:</div><div class="d1value"><input type="password" th:field="*{passWord}" required></input></div><br/>
+		<div class="d1label">MONEY:</div><div class="d1value"><input type="number" min="100" max="5000" th:field="*{money}" required></input></div><br/>
+		<div class="d1label"><a href="/Login">Already a member?</a></div><div class="d1value"><input type="submit" value="REGISTER"></input></div>
+		<div class="errors" th:if="${#fields.hasErrors('*')}">
+			<ul>
+				<li th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+			</ul>
+		</div>
+		<div class="errors" th:if="${registerLenderError}">
+			<ul>
+				<li>User already registered</li>
+			</ul>
+		</div>
+	</form>
+</div>
+<div id="d2">
+	<p>BORROWER</p>
+	<form action="#" th:attr="action=@{/RegisterBorrower}" th:object="${borrowerData}" method="post">
+		<div class="d2label"><label>FIRST NAME:</label></div><div class="d2value"><input type="text" th:field="*{firstName}" required></input></div><br/>
+		<div class="d2label">LAST NAME:</div><div class="d2value"><input type="text" th:field="*{lastName}" required></input></div><br/>
+		<div class="d2label">EMAIL:</div><div class="d2value"><input type="text" th:field="*{eMail}" required></input></div><br/>
+		<div class="d2label">PASSWORD:</div><div class="d2value"><input type="password" th:field="*{passWord}" required></input></div><br/>
+		<div class="d2label">NEED MONEY FOR:</div><div class="d2value"><input type="text" th:field="*{needMoneyFor}" required></input></div><br/>
+		<div class="d2label">DESCRIPTION:</div><div class="d2value"><textarea style="width:100%" th:field="*{description}" required></textarea></div><br/>
+		<div class="d1label">AMOUNT NEEDED:</div><div class="d1value"><input type="number" min="100" max="5000" th:field="*{amountNeeded}" required></input></div><br/>
+		<div class="d2label"><a href="/Login">Already a member?</a></div><div class="d2value"><input type="submit" value="REGISTER"></input></div>
+		<div class="errors" th:if="${#fields.hasErrors('*')}">
+			<ul>
+				<li th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+			</ul>
+		</div>
+		<div class="errors" th:if="${registerBorrowerError}">
+			<ul>
+				<li>User already registered</li>
+			</ul>
+		</div>
+	</form>
+</div>
+</body>
+</html>

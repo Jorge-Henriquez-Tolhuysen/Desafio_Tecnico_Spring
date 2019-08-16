@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrower's Page</title>
+    <style>
+        .information {
+            width:100%;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+        }
+        .information span {
+            position:absolute;
+            right:8px;
+            font-style: revert;
+        }
+        table {
+            width:100%
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        table tr:nth-child(even) {
+            background-color: #eee;
+        }
+        table tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        table th {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="information">
+    <hr/>
+    <span th:text="${sessionId}">Id de session</span><br/>
+</div>
+<a style="float:right;" href="/Logout" >Logout</a><br/>
+Name : <span th:text="${name}">Borrower name</span><br/>
+Amount Needed: <span th:text="${amountNeeded}">Borrower amount needed</span><br/>
+Amount Raised: <span th:text="${amountRaised}">Borrower amount raised</span><br/>
+<br/>
+<br/>
+List of People who lent you money : <br/>
+<br/>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>email</th>
+        <th>Amount Lent</th>
+    </tr>
+    <tr th:each="lent : ${lents}">
+        <td th:text="${lent.name}">User Name</td>
+        <td th:text="${lent.email}">User Email</td>
+        <td th:text="${lent.money}">User Money Lent</td>
+    </tr>
+</table>
+</body>
+</html>

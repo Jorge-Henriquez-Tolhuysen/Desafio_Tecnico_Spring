@@ -1,0 +1,80 @@
+<!doctype html>
+<html  lang="en"
+	   xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8"/>
+<title>Login Page</title>
+<style>
+	#login {
+		width:30%;
+		margin: auto;
+  		border: 3px;
+  		padding: 10px;
+	}
+	.information {
+		width:100%;
+		position: fixed;
+		left: 0;
+		bottom: 0;
+	}
+	.information span {
+		position:absolute;
+		right:8px;
+		font-style: revert;
+	}
+	.errors {
+		background-color: lightsalmon;
+	}
+	.d1label {
+		display:inline-block;
+		width:30%;
+		vertical-align: top;
+	}
+	.d1value {
+		display:inline-block;
+		width:70%;
+		vertical-align: top;
+	}
+	input, textarea {
+		width:100%;
+	}
+	p {
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	input[type="submit"] {
+		float:right; 
+		width:100px;
+	}
+
+</style>
+</head>
+<body>
+<div class="information">
+	<hr/>
+	<span th:text="${sessionId}">Id de session</span><br/>
+</div>
+<div id="login">
+	<p>LOGIN</p>
+	<form action="#" th:attr="action=@{/Login}" th:object="${data}" method="post">
+		<div class="d1label">EMAIL:</div><div class="d1value"><input type="email" th:field="*{email}" required></input></div>
+		<div class="d1label">PASSWORD:</div><div class="d1value"><input type="password" th:field="*{passWord}" required></input></div><br/>
+		<div class="d1label"><a href="/Register">Click here to register</a></div><div class="d1value"><input type="submit" value="REGISTER"></input></div>
+		<div class="errors" th:if="${#fields.hasErrors('*')}">
+			<br/>
+			<ul>
+				<li th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+			</ul>
+			<br/>
+		</div>
+		<div class="errors" th:if="${loginEmailPasswordError}">
+			<br/>
+			<ul>
+				<li>Invalid email/passWord</li>
+			</ul>
+			<br/>
+		</div>
+	</form>
+</div>
+</body>
+</html>
