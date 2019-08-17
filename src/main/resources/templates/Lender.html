@@ -43,7 +43,7 @@
 <body>
 <div class="information">
     <hr/>
-    <span th:text="${sessionId}">Id de session</span><br/>
+    <span th:text="'SessionId:' +  ${sessionId}">Id de session</span><br/>
 </div>
 <a style="float:right;" href="/Logout" >Logout</a><br/>
 Name : <span th:text="${name}">Lender name</span><br/>

@@ -16,6 +16,9 @@
 		right:8px;
 		font-style: revert;
 	}
+	.errors {
+		background-color: lightsalmon;
+	}
 	#d0 {
 		display:inline-block;
 		width:5%;
@@ -70,7 +73,7 @@
 <body>
 <div class="information">
 	<hr/>
-	<span th:text="${sessionId}">Id de session</span><br/>
+	<span th:text="'SessionId:' +  ${sessionId}">Id de session</span><br/>
 </div>
 <div id="d0">&nbsp;</div>
 <div id="d1">
@@ -83,14 +86,18 @@
 		<div class="d1label">MONEY:</div><div class="d1value"><input type="number" min="100" max="5000" th:field="*{money}" required></input></div><br/>
 		<div class="d1label"><a href="/Login">Already a member?</a></div><div class="d1value"><input type="submit" value="REGISTER"></input></div>
 		<div class="errors" th:if="${#fields.hasErrors('*')}">
+			<br/>
 			<ul>
 				<li th:each="err : ${#fields.errors('*')}" th:text="${err}" />
 			</ul>
+			<br/>
 		</div>
 		<div class="errors" th:if="${registerLenderError}">
+			<br/>
 			<ul>
-				<li>User already registered</li>
+				<li>eMail already registered</li>
 			</ul>
+			<br/>
 		</div>
 	</form>
 </div>
@@ -106,14 +113,18 @@
 		<div class="d1label">AMOUNT NEEDED:</div><div class="d1value"><input type="number" min="100" max="5000" th:field="*{amountNeeded}" required></input></div><br/>
 		<div class="d2label"><a href="/Login">Already a member?</a></div><div class="d2value"><input type="submit" value="REGISTER"></input></div>
 		<div class="errors" th:if="${#fields.hasErrors('*')}">
+			<br/>
 			<ul>
 				<li th:each="err : ${#fields.errors('*')}" th:text="${err}" />
 			</ul>
+			<br/>
 		</div>
 		<div class="errors" th:if="${registerBorrowerError}">
+			<br/>
 			<ul>
-				<li>User already registered</li>
+				<li>eMail already registered</li>
 			</ul>
+			<br/>
 		</div>
 	</form>
 </div>

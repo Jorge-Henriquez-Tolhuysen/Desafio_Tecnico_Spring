@@ -52,8 +52,15 @@ public class Borrower {
     @PostMapping("/{borrowerId}")
     public String showBorrower(@PathVariable("borrowerId") String borrowerId, Model model, HttpSession session, HttpServletRequest request) {
         model.addAttribute("sessionId", session.getId());
-        Optional<User> user = userDataRepository.findById(Long.parseLong(borrowerId));
+        if (session.getAttribute("userId")==null) return "redirect:/Login";
+        if (session.getAttribute("userEmail")==null) return "redirect:/Login";
+        if (session.getAttribute("userPassword")==null) return "redirect:/Login";
+        if (!session.getAttribute("userId").toString().equals(borrowerId)) return "redirect:/Login";
+        Optional<User> user = userDataRepository.findbyEmail(session.getAttribute("userEmail").toString());
         if (!user.isPresent()) return "redirect:/Login";
+        if (user.get().getUserId()!=Long.parseLong(session.getAttribute("userId").toString())) return "redirect:/Login";
+        if (user.get().getUserId()!=Long.parseLong(borrowerId)) return "redirect:/Login";
+        if (!user.get().getUserPassword().equals(session.getAttribute("userPassword").toString())) return "redirect:/Login";
         if (!user.get().getUserIsborrower().equals("S")) return "redirect:/Login";
         Optional<BorrowerData> borrowerData = borrowerDataRepository.findById(Long.parseLong(borrowerId));
         model.addAttribute("name", String.format("%s %s", user.get().getUserFirstname(), user.get().getUserLastname()));
@@ -67,7 +74,6 @@ public class Borrower {
             model.addAttribute("amountRaised", 0);
         }
         ArrayList<UserLentData> lentsData = new ArrayList<>();
-
         List<Object[]> l = ledgerDataRepository.summAllDistinctByBorrowerId(Long.parseLong(borrowerId));
         for(Object[] lent: l) {
             UserLentData userLent = new UserLentData();
@@ -79,7 +85,6 @@ public class Borrower {
             }
             lentsData.add(userLent);
         }
-
         model.addAttribute("lents", lentsData);
         return "Borrower";
     }

@@ -1,15 +1,15 @@
 package cl.tolhuysen.henriquez.jorge.desafiotecnicospring.repositories;
 
 import cl.tolhuysen.henriquez.jorge.desafiotecnicospring.model.Ledger;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-public interface LedgerRepository  extends CrudRepository<Ledger, Long> {
+public interface LedgerRepository  extends JpaRepository<Ledger, Long> {
     @Query("SELECT SUM(l.money) FROM Ledger l WHERE l.borrowerData.borrowerId = :id")
     public Optional<BigDecimal> summAllByBorrowerId(@Param("id") Long id);
 

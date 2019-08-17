@@ -57,8 +57,15 @@ public class Lender {
     @PostMapping("/{lenderId}")
     public String showLender(@PathVariable("lenderId") String lenderId, Model model, HttpSession session, HttpServletRequest request) {
         model.addAttribute("sessionId", session.getId());
-        Optional<User> user = userDataRepository.findById(Long.parseLong(lenderId));
+        if (session.getAttribute("userId")==null) return "redirect:/Login";
+        if (session.getAttribute("userEmail")==null) return "redirect:/Login";
+        if (session.getAttribute("userPassword")==null) return "redirect:/Login";
+        if (!session.getAttribute("userId").toString().equals(lenderId)) return "redirect:/Login";
+        Optional<User> user = userDataRepository.findbyEmail(session.getAttribute("userEmail").toString());
         if (!user.isPresent()) return "redirect:/Login";
+        if (user.get().getUserId()!=Long.parseLong(session.getAttribute("userId").toString())) return "redirect:/Login";
+        if (user.get().getUserId()!=Long.parseLong(lenderId)) return "redirect:/Login";
+        if (!user.get().getUserPassword().equals(session.getAttribute("userPassword").toString())) return "redirect:/Login";
         if (!user.get().getUserIslender().equals("S")) return "redirect:/Login";
         Optional<LenderData> lenderData = lenderDataRepository.findById(Long.parseLong(lenderId));
         model.addAttribute("lenderId", lenderId);
@@ -91,7 +98,6 @@ public class Lender {
                     :BigDecimal.valueOf(0L);
             peopleInNeed.add(new UserInNeedData(userInNeed.getUserId(), name, needMoneyFor, description, amountNeeded, amountRaised, maxAmountToLend));
         }
-
         ArrayList<UserLentData> peopleILentMoney = new ArrayList<>();
         for(Object[] lent: ledgerDataRepository.summAllDistinctByLenderId(Long.parseLong(lenderId))) {
             BigDecimal lentAmountLent = BigDecimal.valueOf(Double.parseDouble(lent[0].toString()));
@@ -115,7 +121,6 @@ public class Lender {
             }
             peopleILentMoney.add(new UserLentData(lentName, lentMoneyNeededFor, lentDescription, lentAmountNeeded, lentAmountRaised, lentAmountLent));
         }
-
         model.addAttribute("usersInNeed", peopleInNeed);
         model.addAttribute("usersLent", peopleILentMoney);
         return "Lender";

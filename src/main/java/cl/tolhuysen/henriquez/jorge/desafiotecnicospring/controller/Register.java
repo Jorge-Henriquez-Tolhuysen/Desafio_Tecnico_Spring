@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Controller
 public class Register {
@@ -62,14 +63,14 @@ public class Register {
         if (session.getAttribute("userId")!=null) {
             if (session.getAttribute("userEmail")!=null) {
                 if (session.getAttribute("userPassword")!=null) {
-                    User user = userDataRepository.findbyEmail(session.getAttribute("userEmail").toString());
-                    if (user!=null) {
-                        if (user.getUserPassword().equals(session.getAttribute("userPassword"))) {
-                            if (user.getUserIsborrower().equals("S")) {
-                                return String.format("redirect:/Borrower/%d",user.getUserId());
+                    Optional<User> user = userDataRepository.findbyEmail(session.getAttribute("userEmail").toString());
+                    if (user.isPresent()) {
+                        if (user.get().getUserPassword().equals(session.getAttribute("userPassword"))) {
+                            if (user.get().getUserIsborrower().equals("S")) {
+                                return String.format("redirect:/Borrower/%d",user.get().getUserId());
                             }
-                            if (user.getUserIslender().equals("S")) {
-                                return String.format("redirect:/Lender/%d",user.getUserId());
+                            if (user.get().getUserIslender().equals("S")) {
+                                return String.format("redirect:/Lender/%d",user.get().getUserId());
                             }
                         }
                     }
@@ -81,17 +82,27 @@ public class Register {
         return "Register";
     }
 
+    @GetMapping({"/registerLender","/Registerlender", "/registerlender","/RegisterLender"})
+    public String registerLenderByGet() {
+        return "redirect:/Register";
+    }
+
+    @GetMapping({"/registerBorrower","/Registerborrower", "/registerborrower","/RegisterBorrower"})
+    public String registerBorrowerByGet() {
+        return "redirect:/Register";
+    }
+
     @PostMapping({"/registerLender","/Registerlender", "/registerlender","/RegisterLender"})
     public String registerLender(@Valid @ModelAttribute("lenderData") LenderFormData data, BindingResult bindingResult, Model model, HttpServletRequest request) {
         model.addAttribute("sessionId", request.getSession().getId());
         if (request.getSession().getAttribute("userId")!=null) {
             if (request.getSession().getAttribute("userEmail")!=null) {
                 if (request.getSession().getAttribute("userPassword")!=null) {
-                    User user = userDataRepository.findbyEmail(request.getSession().getAttribute("userEmail").toString());
-                    if (user!=null) {
-                        if (user.getUserPassword().equals(request.getSession().getAttribute("userPassword"))) {
-                            if (user.getUserIslender().equals("S")) {
-                                return String.format("redirect:/Lender/%d",user.getUserId());
+                    Optional<User> user = userDataRepository.findbyEmail(request.getSession().getAttribute("userEmail").toString());
+                    if (user.isPresent()) {
+                        if (user.get().getUserPassword().equals(request.getSession().getAttribute("userPassword"))) {
+                            if (user.get().getUserIslender().equals("S")) {
+                                return String.format("redirect:/Lender/%d",user.get().getUserId());
                             }
                         }
                     }
@@ -99,20 +110,24 @@ public class Register {
             }
         }
         if (bindingResult.hasErrors()) {
+            //lenderData no es necesario, pues viene inyectado en el modelo a travez del formulario que hizo post
             model.addAttribute("borrowerData", borrowerFormData);
             return "Register";
         }
-        User user = userDataRepository.findbyEmail(data.geteMail());
-        if (user!=null) {
+        Optional<User> user = userDataRepository.findbyEmail(data.geteMail());
+        if (user.isPresent()) {
+            //Si esta presente ... estamos intentando duplicar ... es un error
             model.addAttribute("registerLenderError", true);
+            //lenderData no es necesario, pues viene inyectado en el modelo a travez del formulario que hizo post
+            model.addAttribute("borrowerData", borrowerFormData);
             return "Register";
         }
-        user = userDataRepository.save(new User(data.getFirstName(), data.getLastName(), data.geteMail(), data.getPassWord(), "S","N"));
-        LenderData lenderData = lenderDataRepository.save(new LenderData(user.getUserId(), new BigDecimal(data.getMoney())));
-        request.getSession().setAttribute("userId", user.getUserId());
-        request.getSession().setAttribute("userEmail", user.getUserEmail());
-        request.getSession().setAttribute("userPassword", user.getUserPassword());
-        return String.format("redirect:/Lender/%d",user.getUserId());
+        User newUser = userDataRepository.save(new User(data.getFirstName(), data.getLastName(), data.geteMail(), data.getPassWord(), "S","N"));
+        LenderData lenderData = lenderDataRepository.save(new LenderData(newUser.getUserId(), new BigDecimal(data.getMoney())));
+        request.getSession().setAttribute("userId", newUser.getUserId());
+        request.getSession().setAttribute("userEmail", newUser.getUserEmail());
+        request.getSession().setAttribute("userPassword", newUser.getUserPassword());
+        return String.format("redirect:/Lender/%d",newUser.getUserId());
     }
 
     @PostMapping({"/registerBorrower","/Registerborrower", "/registerborrower","/RegisterBorrower"})
@@ -121,11 +136,11 @@ public class Register {
         if (request.getSession().getAttribute("userId")!=null) {
             if (request.getSession().getAttribute("userEmail")!=null) {
                 if (request.getSession().getAttribute("userPassword")!=null) {
-                    User user = userDataRepository.findbyEmail(request.getSession().getAttribute("userEmail").toString());
-                    if (user!=null) {
-                        if (user.getUserPassword().equals(request.getSession().getAttribute("userPassword"))) {
-                            if (user.getUserIsborrower().equals("S")) {
-                                return String.format("redirect:/Borrower/%d",user.getUserId());
+                    Optional<User> user = userDataRepository.findbyEmail(request.getSession().getAttribute("userEmail").toString());
+                    if (user.isPresent()) {
+                        if (user.get().getUserPassword().equals(request.getSession().getAttribute("userPassword"))) {
+                            if (user.get().getUserIsborrower().equals("S")) {
+                                return String.format("redirect:/Borrower/%d",user.get().getUserId());
                             }
                         }
                     }
@@ -134,19 +149,23 @@ public class Register {
         }
         if (bindingResult.hasErrors()) {
             model.addAttribute("lenderData", lenderFormData);
+            //borrowerData no es necesario, pues viene inyectado en el modelo a travez del formulario que hizo post
             return "Register";
         }
-        User user = userDataRepository.findbyEmail(data.geteMail());
-        if (user!=null) {
+        Optional<User> user = userDataRepository.findbyEmail(data.geteMail());
+        if (user.isPresent()) {
+            //Si esta presente ... estamos intentando duplicar ... es un error
             model.addAttribute("registerBorrowerError", true);
+            model.addAttribute("lenderData", lenderFormData);
+            //borrowerData no es necesario, pues viene inyectado en el modelo a travez del formulario que hizo post
             return "Register";
         }
-        user = userDataRepository.save(new User(data.getFirstName(), data.getLastName(), data.geteMail(), data.getPassWord(), "S","N"));
-        BorrowerData borrowerData = borrowerDataRepository.save(new BorrowerData(user.getUserId(),data.getNeedMoneyFor(), data.getDescription(), new BigDecimal(data.getAmountNeeded())));
-        request.getSession().setAttribute("userId", user.getUserId());
-        request.getSession().setAttribute("userEmail", user.getUserEmail());
-        request.getSession().setAttribute("userPassword", user.getUserPassword());
-        return String.format("redirect:/Borrower/%d",user.getUserId());
+        User newUser = userDataRepository.save(new User(data.getFirstName(), data.getLastName(), data.geteMail(), data.getPassWord(), "N","S"));
+        BorrowerData borrowerData = borrowerDataRepository.save(new BorrowerData(newUser.getUserId(),data.getNeedMoneyFor(), data.getDescription(), new BigDecimal(data.getAmountNeeded())));
+        request.getSession().setAttribute("userId", newUser.getUserId());
+        request.getSession().setAttribute("userEmail", newUser.getUserEmail());
+        request.getSession().setAttribute("userPassword", newUser.getUserPassword());
+        return String.format("redirect:/Borrower/%d",newUser.getUserId());
     }
 
 

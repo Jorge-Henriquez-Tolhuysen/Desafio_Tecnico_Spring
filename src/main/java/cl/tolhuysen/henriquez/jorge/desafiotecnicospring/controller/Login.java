@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 public class Login {
@@ -40,14 +41,14 @@ public class Login {
         if (session.getAttribute("userId")!=null) {
             if (session.getAttribute("userEmail")!=null) {
                 if (session.getAttribute("userPassword")!=null) {
-                    User user = userDataRepository.findbyEmail(session.getAttribute("userEmail").toString());
-                    if (user!=null) {
-                        if (user.getUserPassword().equals(session.getAttribute("userPassword"))) {
-                            if (user.getUserIsborrower().equals("S")) {
-                                return String.format("redirect:/Borrower/%d",user.getUserId());
+                    Optional<User> user = userDataRepository.findbyEmail(session.getAttribute("userEmail").toString());
+                    if (user.isPresent()) {
+                        if (user.get().getUserPassword().equals(session.getAttribute("userPassword").toString())) {
+                            if (user.get().getUserIsborrower().equals("S")) {
+                                return String.format("redirect:/Borrower/%d",user.get().getUserId());
                             }
-                            if (user.getUserIslender().equals("S")) {
-                                return String.format("redirect:/Lender/%d",user.getUserId());
+                            if (user.get().getUserIslender().equals("S")) {
+                                return String.format("redirect:/Lender/%d",user.get().getUserId());
                             }
                         }
                     }
@@ -64,27 +65,28 @@ public class Login {
         if (bindingResult.hasErrors()) {
             return "Login";
         }
-        User user = userDataRepository.findbyEmail(data.getEmail());
-        if (user==null) {
+        Optional<User> user = userDataRepository.findbyEmail(data.getEmail());
+        if (!user.isPresent()) {
             model.addAttribute("loginEmailPasswordError", true);
             return "Login";
         }
-        if (!user.getUserPassword().equals(data.getPassWord())) {
+        if (!user.get().getUserPassword().equals(data.getPassWord())) {
             model.addAttribute("loginEmailPasswordError", true);
             return "Login";
         }
-        if (user.getUserIsborrower().equals("S")) {
-            request.getSession().setAttribute("userId", user.getUserId());
+        if (user.get().getUserIsborrower().equals("S")) {
+            request.getSession().setAttribute("userId", user.get().getUserId());
             request.getSession().setAttribute("userEmail", data.getEmail());
             request.getSession().setAttribute("userPassword", data.getPassWord());
-            return String.format("redirect:/Borrower/%d",user.getUserId());
+            return String.format("redirect:/Borrower/%d",user.get().getUserId());
         }
-        if (user.getUserIslender().equals("S")) {
-            request.getSession().setAttribute("userId", user.getUserId());
+        if (user.get().getUserIslender().equals("S")) {
+            request.getSession().setAttribute("userId", user.get().getUserId());
             request.getSession().setAttribute("userEmail", data.getEmail());
             request.getSession().setAttribute("userPassword", data.getPassWord());
-            return String.format("redirect:/Lender/%d",user.getUserId());
+            return String.format("redirect:/Lender/%d",user.get().getUserId());
         }
+        System.out.println(6);
         return "Login";
     }
 }
